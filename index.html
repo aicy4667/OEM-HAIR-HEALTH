@@ -1,0 +1,1039 @@
+
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>OEM｜包裝偏好快速釐清器（化妝品 / 保健食品）</title>
+  <style>
+    :root{
+      /* 米白主題（企業簡報友善） */
+      --bg:#f6f3ee;
+      --panel:#faf7f2;
+      --card:#ffffff;
+      --muted:#7a746b;
+      --text:#2f2b26;
+      --line:rgba(0,0,0,.08);
+      --good:#3aa981;
+      --warn:#e2a93b;
+      --bad:#d96b6b;
+      --accent:#c9a86a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, "Noto Sans TC", Segoe UI, Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #fbf9f5 0%, #f3efe8 100%);
+      color:var(--text);
+      padding:24px;
+    }
+    .wrap{max-width:1220px;margin:0 auto}
+    header{
+      display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+    h1{font-size:22px;margin:0;letter-spacing:.2px}
+    .sub{color:var(--muted);margin-top:6px;font-size:13px;line-height:1.5}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:8px 10px;border:1px solid var(--line);
+      border-radius:999px;background:rgba(255,255,255,.04);
+      color:var(--muted);font-size:12px;
+    }
+    .pill label{display:inline-flex;align-items:center;gap:6px;color:var(--text);font-size:12px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      background: var(--card);
+      border:1px solid var(--line);
+      border-radius:16px;
+      overflow:hidden;
+      box-shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+    .card .hd{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      background: linear-gradient(180deg, #faf7f2, #f3efe8);
+    }
+    .card .hd b{font-size:14px}
+    .card .bd{padding:14px 16px}
+    .section{margin-bottom:14px}
+    label{display:block;color:var(--muted);font-size:12px;margin:0 0 6px}
+    input[type="text"], textarea, select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fffdf8;
+      color:var(--text);
+      outline:none;
+    }
+    textarea{min-height:88px;resize:vertical}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    @media (max-width: 560px){ .row{grid-template-columns:1fr} }
+
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{
+      padding:8px 10px;border-radius:999px;border:1px solid var(--line);
+      background:#fffdf8;color:var(--text);font-size:12px;
+      cursor:pointer; user-select:none;
+      transition: transform .05s ease, background .15s ease;
+    }
+    .chip:active{transform:scale(.98)}
+    .chip.on{
+      border-color: var(--accent);
+      background: rgba(201,168,106,.18);
+    }
+
+    .mini{color:var(--muted);font-size:12px;line-height:1.55}
+    .risk{
+      display:flex;gap:8px;align-items:flex-start;
+      padding:10px 12px;border-radius:12px;border:1px dashed var(--line);
+      background: rgba(255,255,255,.03);
+      margin-top:10px;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;margin-top:5px}
+    .dot.good{background:var(--good)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:var(--bad)}
+
+    .btns{display:flex;gap:10px;flex-wrap:wrap}
+    button{
+      padding:10px 12px;border-radius:12px;border:1px solid var(--line);
+      background:#fffdf8;
+      color: var(--text);
+      cursor:pointer;
+    }
+    button.primary{
+      border-color: var(--accent);
+      background: rgba(201,168,106,.25);
+    }
+
+    pre{
+      white-space:pre-wrap;
+      word-break:break-word;
+      background:#fbf9f5;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:12px;
+      margin:0;
+      color:var(--text);
+      font-size:12px;
+      line-height:1.5;
+    }
+    .kv{
+      display:grid;grid-template-columns: 120px 1fr;gap:8px 10px;
+      font-size:12px;color:var(--text);
+    }
+    .kv div:nth-child(odd){color:var(--muted)}
+    .footerNote{color:var(--muted);font-size:12px;margin-top:10px}
+
+    /* Modal */
+    .modalOverlay{
+      position:fixed; inset:0; display:none;
+      background:rgba(0,0,0,.55);
+      align-items:center; justify-content:center;
+      padding:18px;
+      z-index:9999;
+    }
+    .modal{
+      width:min(920px, 100%);
+      background:#ffffff;
+      border:1px solid var(--line);
+      border-radius:16px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.35);
+      overflow:hidden;
+    }
+    .modalHd{
+      padding:12px 14px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      border-bottom:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .modalHd b{font-size:13px}
+    .modalBd{padding:12px 14px}
+    .modalBd textarea{
+      width:100%; min-height:280px;
+      background:#fbf9f5;
+      border:1px solid var(--line);
+      border-radius:12px;
+      color:var(--text);
+      padding:12px;
+      font-size:12px;
+      line-height:1.55;
+    }
+    .modalFt{padding:12px 14px; display:flex; gap:10px; flex-wrap:wrap; border-top:1px solid var(--line)}
+    .xbtn{border:1px solid var(--line); background:rgba(255,255,255,.06); border-radius:10px; padding:8px 10px; cursor:pointer; color:var(--text)}
+    .help{color:var(--muted); font-size:12px; line-height:1.55}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <h1 style="margin:0;" id="titleH1">OEM｜包裝偏好快速釐清器</h1>
+        <span id="headerMeta" class="pill" style="padding:6px 10px;">—</span>
+      </div>
+      <div class="sub" id="subtitle">
+        給業主用的「選一選就能講清楚」工具：<br/>
+        產出 <b>包裝偏好 Brief</b> ＋ <b>GEMINI CANVAS Prompt</b>，讓 OEM 一開始就對齊方向（少走冤枉路）。
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:flex-end;">
+      <div class="pill" title="切換後會自動換題庫、提示語與法規風險邏輯">
+        OEM 類型：
+        <label><input type="radio" name="oemType" value="cosmetic" checked> 化妝品</label>
+        <label style="margin-left:8px;"><input type="radio" name="oemType" value="health_food"> 保健食品</label>
+      </div>
+      <div class="pill">✅ 可直接發佈｜📄 可複製 Markdown｜🧠 自動生 Prompt</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- Left: Form -->
+    <div class="card">
+      <div class="hd">
+        <b>1) 業主偏好填寫</b>
+        <span class="mini">小提醒：你選的不是「好不好看」，而是「未來量產後像不像你心中的品牌」。</span>
+      </div>
+      <div class="bd">
+
+        <!-- Report Meta -->
+        <div class="row">
+          <div class="section">
+            <label>公司名稱（報告抬頭）</label>
+            <input id="company" type="text" placeholder="例：奇異生技股份有限公司" value="奇異生技股份有限公司" />
+          </div>
+          <div class="section">
+            <label>專案編號（Project ID）</label>
+            <input id="projectId" type="text" placeholder="例：OEM-2025-001" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="section">
+            <label>報告日期</label>
+            <input id="reportDate" type="text" placeholder="YYYY-MM-DD" />
+          </div>
+          <div class="section">
+            <label class="mini">（已移除公司 LOGO）</label>
+            <div class="mini">若未來又需要 LOGO，我可以用「可選開關」方式加回來，避免程式再次打結。</div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>品牌 / 專案名稱</label>
+            <input id="brand" type="text" placeholder="例：奇異生技｜N 系列 / 某某品牌新品" />
+          </div>
+          <div class="section">
+            <label>產品類型</label>
+            <select id="ptype"></select>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>品牌定位（選 1–2）</label>
+            <div class="chips" id="posChips"></div>
+          </div>
+          <div class="section">
+            <label>目標客群</label>
+            <input id="aud" type="text" placeholder="例：25–40 女性／沙龍專業人士／上班族／銀髮族群" />
+          </div>
+        </div>
+
+        <div class="section">
+          <label>通路（選 1–2）</label>
+          <div class="chips" id="channelChips"></div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>包裝形式（選 1–2）</label>
+            <div class="chips" id="packChips"></div>
+          </div>
+          <div class="section">
+            <label>材質偏好（選 1–2）</label>
+            <div class="chips" id="matChips"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>色系偏好（可複選）</label>
+            <div class="chips" id="colorChips"></div>
+          </div>
+          <div class="section">
+            <label>質感與氛圍（選 2–4）</label>
+            <div class="chips" id="moodChips"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>字體 / 排版風格（選 1–2）</label>
+            <div class="chips" id="typeChips"></div>
+          </div>
+          <div class="section">
+            <label>圖像語言（選 1–2）</label>
+            <div class="chips" id="visualChips"></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="section">
+            <label>你想避免的風格（選 1–3）</label>
+            <div class="chips" id="avoidChips"></div>
+          </div>
+          <div class="section">
+            <label id="ingLabel">成分 / 科技形象（可填）</label>
+            <input id="ing" type="text" placeholder="例：植萃、胜肽（注意合規）" />
+          </div>
+        </div>
+
+        <div class="section">
+          <label>補充備註（業主自由描述）</label>
+          <textarea id="note" placeholder="例：希望更像醫美診所的信任感，但不要醫療器械感；避免過度少女；喜歡留白與霧面材質。"></textarea>
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="btnSample">套用示範</button>
+          <button id="btnReset">清空重填</button>
+          <button class="primary" id="btnCopyMd">複製 Markdown 報告</button>
+          <button id="btnCopyPrompt">複製 GEMINI Prompt</button>
+        </div>
+
+        <div class="footerNote" id="footerNote">
+          😄 友情提醒：如果你同時勾選「黑金奢華」又勾「親民可愛」，那不是品牌定位，那是人格分裂——右側會提醒你先做決策收斂。
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Outputs -->
+    <div class="card">
+      <div class="hd">
+        <b>2) 產出（可直接交付）</b>
+        <span class="mini">即時更新：Brief 摘要 + 一致性提醒 + 法規風險紅黃綠燈 + GEMINI Prompt</span>
+      </div>
+      <div class="bd">
+
+        <div class="section">
+          <label>包裝偏好摘要（給決策者 / 工廠 / 設計）</label>
+          <div class="kv" id="briefKv"></div>
+
+          <div class="risk" id="riskBox">
+            <div class="dot good" id="riskDot"></div>
+            <div>
+              <div style="font-size:12px;margin-bottom:4px;"><b id="riskTitle">一致性風險：良好</b></div>
+              <div class="mini" id="riskMsg">目前選項整體一致，適合直接進入視覺提案。</div>
+            </div>
+          </div>
+
+          <div class="risk" id="lawBox">
+            <div class="dot good" id="lawDot"></div>
+            <div>
+              <div style="font-size:12px;margin-bottom:4px;"><b id="lawTitle">法規風險：低（綠燈）</b></div>
+              <div class="mini" id="lawMsg">目前用語與方向相對保守；仍建議進入內部合規審查流程。</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <label>GEMINI CANVAS Prompt（可直接貼）</label>
+          <pre id="promptOut"></pre>
+        </div>
+
+        <div class="section">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <label>Markdown 報告預覽</label>
+            <button id="btnCopyMdInline" class="primary" style="padding:6px 10px;font-size:12px;">複製</button>
+          </div>
+          <pre id="mdOut"></pre>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal (fallback for copy restrictions) -->
+<div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal">
+    <div class="modalHd">
+      <b id="modalTitle">輸出內容</b>
+      <button class="xbtn" id="modalClose">關閉</button>
+    </div>
+    <div class="modalBd">
+      <div class="help" id="modalHelp" style="margin-bottom:10px;">若瀏覽器限制剪貼簿，請在此手動複製。</div>
+      <textarea id="modalText" spellcheck="false"></textarea>
+    </div>
+    <div class="modalFt">
+      <button class="primary" id="modalCopy">一鍵複製（備援）</button>
+      <button id="modalSelect">全選</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+let oemType = "cosmetic"; // "cosmetic" | "health_food"
+
+function formatDateYYYYMMDD(d){
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const dd = String(d.getDate()).padStart(2,'0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function updateHeaderMeta(){
+  const company = (document.getElementById("company")?.value || "").trim();
+  const pid = (document.getElementById("projectId")?.value || "").trim();
+  const dt = (document.getElementById("reportDate")?.value || "").trim();
+  const typeLabel = (oemType === "cosmetic") ? "化妝品" : "保健食品";
+  const meta = [typeLabel, company, pid ? `#${pid}` : "", dt].filter(Boolean).join(" · ");
+  const metaEl = document.getElementById("headerMeta");
+  if(metaEl) metaEl.textContent = meta || "—";
+}
+
+function getTypeLabels(){
+  if(oemType === "cosmetic"){
+    return {
+      title: "化妝品 OEM｜包裝偏好快速釐清器",
+      subtitle: "給業主用的「選一選就能講清楚」工具：\n產出 包裝偏好 Brief ＋ GEMINI CANVAS Prompt，讓 OEM 一開始就對齊方向（少走冤枉路）。",
+      ingLabel: "成分 / 科技形象（可填）",
+      ingPlaceholder: "例：植萃、胜肽（注意合規）",
+      sampleName: "套用示範（沙龍高端）"
+    };
+  }
+  return {
+    title: "保健食品 OEM｜產品與包裝方向快速釐清器",
+    subtitle: "給業主用的「選一選就能說清楚」工具：\n產出 產品方向 Brief ＋ 包裝重點 ＋ 法規風險紅黃綠燈，讓 OEM 在打樣/上架前先對齊（降低返工）。",
+    ingLabel: "主成分 / 機能訴求（將影響標示與合規）",
+    ingPlaceholder: "例：葉黃素、益生菌、膠原蛋白（避免治療/疾病暗示）",
+    sampleName: "套用示範（上班族機能）"
+  };
+}
+
+function applyTypeLabels(){
+  const labels = getTypeLabels();
+  document.getElementById("titleH1").textContent = labels.title;
+
+  const subtitle = document.getElementById("subtitle");
+  subtitle.innerHTML = labels.subtitle.replaceAll("\n", "<br/>");
+
+  document.getElementById("ingLabel").textContent = labels.ingLabel;
+  document.getElementById("ing").placeholder = labels.ingPlaceholder;
+  document.getElementById("btnSample").textContent = labels.sampleName;
+}
+
+function makeChips(containerId, items){
+  const el = document.getElementById(containerId);
+  if(!el) return;
+  el.innerHTML = "";
+  items.forEach(txt=>{
+    const c = document.createElement("div");
+    c.className = "chip";
+    c.textContent = txt;
+    c.onclick = ()=>{ c.classList.toggle("on"); updateAll(); };
+    el.appendChild(c);
+  });
+}
+
+function getSelected(containerId){
+  return [...document.querySelectorAll(`#${containerId} .chip.on`)].map(x=>x.textContent);
+}
+
+function setSelected(containerId, arr){
+  document.querySelectorAll(`#${containerId} .chip`).forEach(ch=>{
+    ch.classList.toggle("on", arr.includes(ch.textContent));
+  });
+}
+
+function kvRow(k,v){
+  const d1 = document.createElement("div"); d1.textContent = k;
+  const d2 = document.createElement("div"); d2.textContent = v || "—";
+  return [d1,d2];
+}
+
+// ---------- Data (by OEM type) ----------
+const baseCfg = {
+  mat: ["霧面塑料","透明塑料","玻璃","霧面玻璃","金屬質感（局部）","紙盒外包裝","環保材質感"],
+  color: ["象牙白","霧金","黑金","米白","淡綠","淡黃","霧灰","深藍","玫瑰金","裸粉","透明感"],
+  mood: ["專業可信","乾淨純淨","溫柔親膚","低調奢華","自然清新","理性克制","高級感","療癒感","有力量（但不侵略）"],
+  type: ["現代無襯線","細字極簡","高級襯線","理性格線排版","大留白＋小字","資訊清晰導向"],
+  visual: ["抽象光感","線條流動","植物意象（抽象）","幾何科技感（低調）","水感透明層次","無圖像（純排版）"],
+  avoid: ["過度醫療器械感","過度促銷電商感","過度少女可愛","太花太滿","廉價金光閃亮","強烈對比刺眼"]
+};
+
+const cfgByType = {
+  cosmetic: {
+    pos: ["醫美友善（非醫療）","沙龍專業","高端精品","溫和敏弱","自然植萃","科技感（克制）","親民日常","極簡留白"],
+    channel: ["沙龍 B2B","官網電商","醫美診所通路","藥局 / 通路","直播團購","百貨專櫃"],
+    pack: ["圓瓶","方瓶","滴管","按壓瓶","噴霧","安瓶","軟管","罐裝"],
+    ptype: ["洗髮精","護髮 / 髮膜","頭皮精華","安瓶","臉部精華","面霜","化妝水","卸妝 / 清潔","防曬","身體乳"]
+  },
+  health_food: {
+    pos: ["專業保健品牌","日常補充型","機能訴求導向","高端送禮市場","家庭常備型","銀髮友善","上班族機能補給","極簡留白"],
+    channel: ["官網電商","藥局 / 藥妝通路","診所 / 專業通路","團購 / 社群分潤","直銷 / 會員制","跨境電商"],
+    pack: ["鋁箔袋","PTP 鋁箔包","玻璃瓶","塑膠瓶","隨身條包","禮盒組"],
+    ptype: ["膠囊","錠劑","粉包","液態飲","滴劑","機能軟糖","沖泡飲","複方機能配方"]
+  }
+};
+
+function updatePtypeOptions(){
+  const select = document.getElementById("ptype");
+  if(!select) return;
+  select.innerHTML = "";
+  cfgByType[oemType].ptype.forEach(t=>{
+    const opt = document.createElement("option");
+    opt.textContent = t;
+    select.appendChild(opt);
+  });
+}
+
+function applyOEMMode(){
+  applyTypeLabels();
+
+  const cfg = cfgByType[oemType];
+  makeChips("posChips", cfg.pos);
+  makeChips("channelChips", cfg.channel);
+  makeChips("packChips", cfg.pack);
+
+  // shared chips
+  makeChips("matChips", baseCfg.mat);
+  makeChips("colorChips", baseCfg.color);
+  makeChips("moodChips", baseCfg.mood);
+  makeChips("typeChips", baseCfg.type);
+  makeChips("visualChips", baseCfg.visual);
+  makeChips("avoidChips", baseCfg.avoid);
+
+  updatePtypeOptions();
+}
+
+// ---------- Risk: consistency (style) ----------
+function evaluateRiskConsistency(sel){
+  let score = 0;
+  const warns = [];
+  const has = (arr, key) => Array.isArray(arr) && arr.includes(key);
+
+  if (has(sel.mood,"低調奢華") && has(sel.pos,"親民日常")) { score+=2; warns.push("同時選到「低調奢華」與「親民日常」，建議先決定價格帶與通路語言。"); }
+  if (has(sel.color,"黑金") && !has(sel.avoid,"廉價金光閃亮") && has(sel.mood,"低調奢華")) { score+=1; warns.push("黑金做得好是精品；做不好就是KTV。建議鎖定『霧金＋留白』，避免亮面大面積金色。"); }
+  if (has(sel.pos,"科技感（克制）") && has(sel.mood,"自然清新")) { score+=1; warns.push("科技感與自然感可以共存，但需要『抽象植物＋理性排版』來平衡。"); }
+
+  if (oemType === "health_food" && has(sel.pos,"高端送禮市場") && has(sel.channel,"團購 / 社群分潤")) {
+    score+=1; warns.push("送禮高端與團購語言可共存，但包裝必須走『禮盒感』，並避免過度促銷視覺。");
+  }
+
+  let level = "good";
+  if (score >= 4) level = "bad";
+  else if (score >= 2) level = "warn";
+
+  return {score, level, warns};
+}
+
+// ---------- Risk: regulation traffic light ----------
+const regulationKeywords = {
+  cosmetic: {
+    high: ["治療","醫療","療效","外泌體","幹細胞","stem cell","exosome"],
+    mid: ["修復","再生","抗老","改善疾病","預防"]
+  },
+  health_food: {
+    high: ["治療","改善疾病","預防","療效","醫師推薦","藥效","處方","diagnose","cure"],
+    mid: ["改善","抗老","修復","活化","調整","延緩老化","減少疼痛","消炎"]
+  }
+};
+
+function evaluateRegulationRisk(text){
+  const t = (text || "").toLowerCase();
+  const dict = regulationKeywords[oemType];
+  let score = 0;
+  const hitsHigh = [];
+  const hitsMid = [];
+
+  dict.high.forEach(k=>{
+    if(t.includes(k.toLowerCase())){ score += 3; hitsHigh.push(k); }
+  });
+  dict.mid.forEach(k=>{
+    if(t.includes(k.toLowerCase())){ score += 1; hitsMid.push(k); }
+  });
+
+  let level = "green";
+  if(score >= 5) level = "red";
+  else if(score >= 2) level = "yellow";
+
+  const note = [];
+  if(hitsHigh.length) note.push(`高風險詞：${hitsHigh.join("、")}`);
+  if(hitsMid.length) note.push(`注意詞：${hitsMid.join("、")}`);
+
+  return {level, score, note};
+}
+
+function updateRegulationUI(reg){
+  const dot = document.getElementById("lawDot");
+  const title = document.getElementById("lawTitle");
+  const msg = document.getElementById("lawMsg");
+
+  if(reg.level === "green"){
+    dot.className = "dot good";
+    title.textContent = "法規風險：低（綠燈）";
+    msg.textContent = "目前用語與方向相對保守；仍建議進入內部合規審查流程。";
+  } else if(reg.level === "yellow") {
+    dot.className = "dot warn";
+    title.textContent = "法規風險：中（黃燈｜需調整）";
+    msg.textContent = (reg.note[0] || "部分用語可能踩線，建議先改寫成更保守的描述，再進入量產。");
+  } else {
+    dot.className = "dot bad";
+    title.textContent = "法規風險：高（紅燈｜不建議）";
+    msg.textContent = (reg.note[0] || "目前設定極可能踩法規或被判定誇大／醫療暗示，請先做合規修正。");
+  }
+}
+
+// ---------- Builders ----------
+function collect(){
+  return {
+    company: (document.getElementById("company")?.value || "").trim(),
+    projectId: (document.getElementById("projectId")?.value || "").trim(),
+    reportDate: (document.getElementById("reportDate")?.value || "").trim(),
+    brand: (document.getElementById("brand")?.value || "").trim(),
+    ptype: (document.getElementById("ptype")?.value || "").trim(),
+    aud: (document.getElementById("aud")?.value || "").trim(),
+    ing: (document.getElementById("ing")?.value || "").trim(),
+    note: (document.getElementById("note")?.value || "").trim(),
+    pos: getSelected("posChips"),
+    channel: getSelected("channelChips"),
+    pack: getSelected("packChips"),
+    mat: getSelected("matChips"),
+    color: getSelected("colorChips"),
+    mood: getSelected("moodChips"),
+    type: getSelected("typeChips"),
+    visual: getSelected("visualChips"),
+    avoid: getSelected("avoidChips"),
+  };
+}
+
+function buildPrompt(sel){
+  const pos = sel.pos.join("、") || "（未選）";
+  const channel = sel.channel.join("、") || "（未選）";
+  const pack = sel.pack.join("、") || "（未選）";
+  const mat = sel.mat.join("、") || "（未選）";
+  const color = sel.color.join("、") || "（未選）";
+  const mood = sel.mood.join("、") || "（未選）";
+  const type = sel.type.join("、") || "（未選）";
+  const visual = sel.visual.join("、") || "（未選）";
+  const avoid = sel.avoid.join("、") || "（未選）";
+
+  const baseMeta =
+`（內部報告資訊）
+公司：${sel.company || "（未填）"}
+專案編號：${sel.projectId || "（未填）"}
+日期：${sel.reportDate || "（未填）"}
+
+`;
+
+  if(oemType === "cosmetic"){
+    return baseMeta +
+`請生成一組「化妝品 OEM 包裝視覺方向」作為設計提案參考（非插畫、需具量產可行感）。
+
+【基本資料】
+品牌/專案：${sel.brand || "（未填）"}
+產品類型：${sel.ptype}
+目標客群：${sel.aud || "（未填）"}
+通路：${channel}
+品牌定位：${pos}
+
+【包裝偏好】
+包裝形式：${pack}
+材質偏好：${mat}
+色系偏好：${color}
+質感/氛圍：${mood}
+字體/排版：${type}
+圖像語言：${visual}
+
+【想避免的風格】
+${avoid}
+
+【成分/科技形象（如需）】
+${sel.ing || "（未填）"}
+
+【補充備註】
+${sel.note || "（未填）"}
+
+【硬性規範】
+- 視覺需呈現專業、乾淨、可信任
+- 避免醫療器械感、治療暗示、療效誇張
+- 可直接用於 OEM 提案與設計 brief 對齊
+- 以商業產品攝影/包裝設計語言呈現：清晰比例、合理材質、可量產印刷感`;
+  }
+
+  return baseMeta +
+`請生成一組「保健食品 OEM 產品與包裝方向」作為提案參考。
+
+【合規語境】
+- 以台灣食品法規語境撰寫
+- 避免醫療、治療、疾病預防、誇大療效暗示
+- 強調長期補充、日常保養、安心可追溯
+
+【基本資料】
+品牌/專案：${sel.brand || "（未填）"}
+劑型/產品類型：${sel.ptype}
+目標族群：${sel.aud || "（未填）"}
+通路：${channel}
+品牌定位：${pos}
+
+【包裝方向】
+包裝形式：${pack}
+材質偏好：${mat}
+色系偏好：${color}
+質感/氛圍：${mood}
+字體/排版：${type}（資訊可讀性優先）
+圖像語言：${visual}
+
+【想避免的風格】
+${avoid}
+
+【主成分/機能訴求（合規用語）】
+${sel.ing || "（未填）"}
+
+【補充備註】
+${sel.note || "（未填）"}
+
+【硬性規範】
+- 視覺需呈現專業、安心、可長期補充
+- 包裝需預留營養標示/成分資訊版面（可讀性）
+- 避免藥品視覺、醫師背書暗示、病症用語
+- 可直接用於 OEM 提案與包裝 brief 對齊（可量產印刷感）`;
+}
+
+function bullets(arr){ return arr.length ? arr.map(x=>`- ${x}`).join("\n") : "- —"; }
+
+function buildMarkdown(sel, consistency, reg){
+  const typeTitle = (oemType === "cosmetic") ? "化妝品 OEM" : "保健食品 OEM";
+  const warns = consistency.warns.length ? consistency.warns.map(w=>`- ⚠️ ${w}`).join("\n") : "- ✅ 目前無明顯衝突";
+  const regLine = (reg.level === "green") ? "🟢 低（綠燈）" : (reg.level === "yellow") ? "🟡 中（黃燈）" : "🔴 高（紅燈）";
+  const regNote = reg.note.length ? reg.note.map(x=>`- ${x}`).join("\n") : "- —";
+
+  return `# ${typeTitle}｜偏好 Brief（業主填寫版）
+
+**公司**：${sel.company || "—"}  
+**專案編號**：${sel.projectId || "—"}  
+**日期**：${sel.reportDate || "—"}  
+
+---
+
+**品牌/專案**：${sel.brand || "—"}  
+**產品類型**：${sel.ptype}  
+**目標客群**：${sel.aud || "—"}  
+
+## 1) 定位與通路
+**品牌定位**  
+${bullets(sel.pos)}
+
+**通路**  
+${bullets(sel.channel)}
+
+## 2) 包裝偏好
+**包裝形式**  
+${bullets(sel.pack)}
+
+**材質偏好**  
+${bullets(sel.mat)}
+
+**色系偏好**  
+${bullets(sel.color)}
+
+**質感/氛圍**  
+${bullets(sel.mood)}
+
+**字體/排版**  
+${bullets(sel.type)}
+
+**圖像語言**  
+${bullets(sel.visual)}
+
+## 3) 避免項
+${bullets(sel.avoid)}
+
+## 4) 成分/訴求（合規用語）
+${sel.ing || "—"}
+
+## 5) 補充備註
+${sel.note || "—"}
+
+---
+
+## 6) 風險提醒
+**一致性風險**
+${warns}
+
+**法規風險等級**：${regLine}
+${regNote}
+
+---
+
+## 7) GEMINI CANVAS Prompt
+\`\`\`
+${buildPrompt(sel).trim()}
+\`\`\`
+`;
+}
+
+function updateAll(){
+  const sel = collect();
+
+  // brief kv
+  const kv = document.getElementById("briefKv");
+  kv.innerHTML = "";
+  const items = [
+    ["OEM 類型", (oemType === "cosmetic") ? "化妝品" : "保健食品"],
+    ["公司", sel.company],
+    ["專案編號", sel.projectId],
+    ["日期", sel.reportDate],
+    ["品牌/專案", sel.brand],
+    ["產品類型", sel.ptype],
+    ["目標客群", sel.aud],
+    ["通路", sel.channel.join("、")],
+    ["定位", sel.pos.join("、")],
+    ["包裝形式", sel.pack.join("、")],
+    ["材質", sel.mat.join("、")],
+    ["色系", sel.color.join("、")],
+    ["氛圍", sel.mood.join("、")],
+    ["字體/排版", sel.type.join("、")],
+    ["圖像語言", sel.visual.join("、")],
+    ["避免項", sel.avoid.join("、")],
+    ["成分/訴求", sel.ing],
+  ];
+  items.forEach(([k,v])=>{
+    kv.append(...kvRow(k, v));
+  });
+
+  // consistency risk
+  const consistency = evaluateRiskConsistency(sel);
+  const rdot = document.getElementById("riskDot");
+  const rtitle = document.getElementById("riskTitle");
+  const rmsg = document.getElementById("riskMsg");
+  rdot.className = "dot " + consistency.level;
+  if(consistency.level === "good"){
+    rtitle.textContent = "一致性風險：良好（可進入提案）";
+    rmsg.textContent = "選項整體一致；可用右側 Prompt 直接產出方向圖。";
+  } else if(consistency.level === "warn") {
+    rtitle.textContent = "一致性風險：需對齊（建議收斂）";
+    rmsg.textContent = consistency.warns[0] || "部分選項可能互斥，建議先確定定位與通路語言。";
+  } else {
+    rtitle.textContent = "一致性風險：高（很可能返工）";
+    rmsg.textContent = consistency.warns[0] || "目前選項衝突較多，建議先做定位決策再進入設計。";
+  }
+
+  // regulation risk
+  const reg = evaluateRegulationRisk((sel.ing || "") + " " + (sel.note || ""));
+  updateRegulationUI(reg);
+
+  // outputs
+  document.getElementById("promptOut").textContent = buildPrompt(sel).trim();
+  document.getElementById("mdOut").textContent = buildMarkdown(sel, consistency, reg).trim();
+
+  updateHeaderMeta();
+}
+
+// ---------- Modal helpers (fallback) ----------
+const overlay = document.getElementById("modalOverlay");
+const modalTitle = document.getElementById("modalTitle");
+const modalHelp = document.getElementById("modalHelp");
+const modalText = document.getElementById("modalText");
+const modalClose = document.getElementById("modalClose");
+const modalCopy = document.getElementById("modalCopy");
+const modalSelect = document.getElementById("modalSelect");
+
+function openModal(title, help, text){
+  modalTitle.textContent = title;
+  modalHelp.textContent = help;
+  modalText.value = text;
+  overlay.style.display = "flex";
+  overlay.setAttribute("aria-hidden","false");
+  setTimeout(()=>{ modalText.focus(); modalText.select(); }, 50);
+}
+function closeModal(){
+  overlay.style.display = "none";
+  overlay.setAttribute("aria-hidden","true");
+}
+
+function legacyCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed';
+  ta.style.top = '-9999px';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  let ok = false;
+  try{ ok = document.execCommand('copy'); }catch(e){ ok = false; }
+  ta.remove();
+  return ok;
+}
+
+async function tryCopy(text){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch(e){
+    return legacyCopy(text);
+  }
+}
+
+modalClose.onclick = closeModal;
+overlay.addEventListener('click', (e)=>{ if(e.target === overlay) closeModal(); });
+modalSelect.onclick = ()=>{ modalText.focus(); modalText.select(); };
+modalCopy.onclick = async ()=>{
+  const ok = await tryCopy(modalText.value);
+  alert(ok ? "已複製 ✅" : "複製失敗，請手動 Ctrl/Cmd+C");
+};
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeModal(); });
+
+// ---------- Buttons ----------
+document.getElementById("btnReset").onclick = ()=>{
+  document.getElementById("company").value = "奇異生技股份有限公司";
+  document.getElementById("projectId").value = "";
+  document.getElementById("reportDate").value = formatDateYYYYMMDD(new Date());
+
+  document.getElementById("brand").value = "";
+  document.getElementById("aud").value = "";
+  document.getElementById("ing").value = "";
+  document.getElementById("note").value = "";
+  ["posChips","channelChips","packChips","matChips","colorChips","moodChips","typeChips","visualChips","avoidChips"]
+    .forEach(cid=> setSelected(cid, []));
+
+  updateAll();
+};
+
+document.getElementById("btnSample").onclick = ()=>{
+  document.getElementById("company").value = "奇異生技股份有限公司";
+  document.getElementById("projectId").value = (oemType === "cosmetic") ? "OEM-DEMO-001" : "HF-DEMO-001";
+  document.getElementById("reportDate").value = formatDateYYYYMMDD(new Date());
+
+  if(oemType === "cosmetic"){
+    document.getElementById("brand").value = "（示範）沙龍高端護理系列";
+    document.getElementById("ptype").value = "頭皮精華";
+    document.getElementById("aud").value = "沙龍專業人士／重視頭皮管理的消費者";
+    document.getElementById("ing").value = "植萃、胜肽（合規用語為主）";
+    document.getElementById("note").value = "希望有醫美友善的信任感，但不要醫療器械感；偏留白、霧面、低調奢華。";
+
+    setSelected("posChips", ["沙龍專業","高端精品","極簡留白"]);
+    setSelected("channelChips", ["沙龍 B2B","官網電商"]);
+    setSelected("packChips", ["滴管","圓瓶"]);
+    setSelected("matChips", ["霧面玻璃","紙盒外包裝"]);
+    setSelected("colorChips", ["象牙白","霧金","霧灰"]);
+    setSelected("moodChips", ["專業可信","低調奢華","理性克制","高級感"]);
+    setSelected("typeChips", ["細字極簡","大留白＋小字"]);
+    setSelected("visualChips", ["抽象光感","線條流動"]);
+    setSelected("avoidChips", ["過度醫療器械感","過度促銷電商感","廉價金光閃亮"]);
+  } else {
+    document.getElementById("brand").value = "（示範）上班族晶亮補給";
+    document.getElementById("ptype").value = "膠囊";
+    document.getElementById("aud").value = "上班族／長時間用眼族群（以日常補充語境）";
+    document.getElementById("ing").value = "葉黃素、玉米黃素（以日常補充、保養語境呈現）";
+    document.getElementById("note").value = "希望主視覺專業安心、可長期補充；避免藥品感與醫師背書暗示。";
+
+    setSelected("posChips", ["專業保健品牌","日常補充型","上班族機能補給"]);
+    setSelected("channelChips", ["官網電商","藥局 / 藥妝通路"]);
+    setSelected("packChips", ["玻璃瓶","禮盒組"]);
+    setSelected("matChips", ["玻璃","紙盒外包裝"]);
+    setSelected("colorChips", ["米白","淡黃","淡綠"]);
+    setSelected("moodChips", ["專業可信","乾淨純淨","理性克制","高級感"]);
+    setSelected("typeChips", ["現代無襯線","資訊清晰導向"]);
+    setSelected("visualChips", ["無圖像（純排版）","抽象光感"]);
+    setSelected("avoidChips", ["過度促銷電商感","強烈對比刺眼","太花太滿"]);
+  }
+
+  updateAll();
+};
+
+async function copyMarkdown(){
+  const text = document.getElementById("mdOut").textContent || "";
+  const ok = await tryCopy(text);
+  if(ok){
+    alert("已複製 Markdown 報告 ✅（可直接貼到 Notion / Google Doc）");
+  }else{
+    openModal(
+      "Markdown 報告（複製受限備援）",
+      "此環境可能限制剪貼簿。請在此全選後 Ctrl/Cmd+C 複製。",
+      text
+    );
+  }
+}
+
+document.getElementById("btnCopyMd").onclick = copyMarkdown;
+document.getElementById("btnCopyMdInline").onclick = copyMarkdown;
+
+document.getElementById("btnCopyPrompt").onclick = async ()=>{
+  const text = document.getElementById("promptOut").textContent || "";
+  const ok = await tryCopy(text);
+  if(ok){
+    alert("已複製 GEMINI CANVAS Prompt ✅");
+  }else{
+    openModal(
+      "GEMINI CANVAS Prompt（複製受限備援）",
+      "此環境可能限制剪貼簿。請在此全選後 Ctrl/Cmd+C 複製。",
+      text
+    );
+  }
+};
+
+// ---------- Mode switch listeners ----------
+document.querySelectorAll('input[name="oemType"]').forEach(radio=>{
+  radio.addEventListener("change", (e)=>{
+    oemType = e.target.value;
+    applyOEMMode();
+
+    // 清掉勾選，避免跨領域殘留造成誤判
+    ["posChips","channelChips","packChips","matChips","colorChips","moodChips","typeChips","visualChips","avoidChips"]
+      .forEach(cid=> setSelected(cid, []));
+
+    updateAll();
+  });
+});
+
+// ---------- Init ----------
+(function init(){
+  const reportDateEl = document.getElementById("reportDate");
+  if(reportDateEl && !reportDateEl.value){
+    reportDateEl.value = formatDateYYYYMMDD(new Date());
+  }
+
+  applyOEMMode();
+
+  ["company","projectId","reportDate","brand","ptype","aud","ing","note"].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener("input", updateAll);
+    el.addEventListener("change", updateAll);
+  });
+
+  updateAll();
+
+  // Basic self-tests (console)
+  (function runTests(){
+    const results = [];
+    const assert = (name, cond)=> results.push({name, pass: !!cond});
+    try{ updateHeaderMeta(); assert("updateHeaderMeta does not throw", true); }
+    catch(e){ assert("updateHeaderMeta does not throw", false); }
+    const sel = collect();
+    const prompt = buildPrompt(sel);
+    assert("Prompt includes 公司欄位", prompt.includes("公司："));
+    const reg = evaluateRegulationRisk((sel.ing||"") + " " + (sel.note||""));
+    assert("Regulation risk returns level", ["green","yellow","red"].includes(reg.level));
+    console.log(`[OEM Switch Tool Tests] ${results.filter(r=>r.pass).length}/${results.length} passed`, results);
+  })();
+})();
+</script>
+</body>
+</html>
